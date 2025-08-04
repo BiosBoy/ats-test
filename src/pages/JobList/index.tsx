@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Typography, Card, CardContent, Box } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 
 import Pagination from '../../components/Pagination';
 import SearchBar from '../../components/SearchBar';
@@ -18,7 +18,11 @@ import styles from './index.module.scss';
 const techOptions = Array.from(new Set(jobs.flatMap((job) => job.technologies))).sort();
 
 const JobList = () => {
-  const [selectedTechs, setSelectedTechs] = useState<string[]>([]);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const [selectedTechs, setSelectedTechs] = useState<string[]>(
+    searchParams.get('technology')?.split(',') || []
+  );
 
   const filteredJobs = jobs.filter((job) => {
     if (selectedTechs.length === 0) {
@@ -39,6 +43,23 @@ const JobList = () => {
     data: filteredJobs,
     searchKey: 'title',
   });
+
+  useEffect(() => {
+    const params: Record<string, string> = {};
+    if (searchQuery) {
+      params.search = searchQuery;
+    }
+
+    if (currentPage > 1) {
+      params.page = currentPage.toString();
+    }
+
+    if (selectedTechs.length) {
+      params.technology = selectedTechs.join(',');
+    }
+
+    setSearchParams(params);
+  }, [searchQuery, currentPage, selectedTechs, setSearchParams]);
 
   return (
     <div className="listWrap">

@@ -1,5 +1,6 @@
-import { TextField, InputAdornment } from '@mui/material';
+import { TextField, InputAdornment, IconButton } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
+import ClearIcon from '@mui/icons-material/Clear';
 
 interface Props {
   value: string;
@@ -8,6 +9,10 @@ interface Props {
 }
 
 const SearchBar = ({ value, onChange, placeholder = 'Search...' }: Props) => {
+  const handleClear = () => {
+    onChange('');
+  };
+
   return (
     <TextField
       fullWidth
@@ -19,6 +24,13 @@ const SearchBar = ({ value, onChange, placeholder = 'Search...' }: Props) => {
         startAdornment: (
           <InputAdornment position="start">
             <SearchIcon />
+          </InputAdornment>
+        ),
+        endAdornment: value && (
+          <InputAdornment position="end">
+            <IconButton aria-label="clear search" onClick={handleClear} edge="end" size="small">
+              <ClearIcon fontSize="small" />
+            </IconButton>
           </InputAdornment>
         ),
       }}

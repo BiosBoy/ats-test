@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Card, CardContent, Typography, Box } from '@mui/material';
 
 import SearchBar from '../../components/SearchBar';
@@ -16,7 +16,11 @@ import useSearchPagination from '../../hooks/useSearchPagination';
 const companyOptions = companies.map((company) => company.name).sort();
 
 const CandidateList = () => {
-  const [selectedCompanies, setSelectedCompanies] = useState<string[]>([]);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const [selectedCompanies, setSelectedCompanies] = useState<string[]>(
+    searchParams.get('companies')?.split(',') || []
+  );
 
   const filteredCandidates = useMemo(() => {
     return candidates.filter((candidate) => {
@@ -45,6 +49,21 @@ const CandidateList = () => {
     data: filteredCandidates,
     searchKey: 'name',
   });
+
+  useEffect(() => {
+    const params: Record<string, string> = {};
+    if (searchQuery) {
+      params.search = searchQuery;
+    }
+    if (currentPage > 1) {
+      params.page = currentPage.toString();
+    }
+    if (selectedCompanies.length) {
+      params.companies = selectedCompanies.join(',');
+    }
+
+    setSearchParams(params);
+  }, [searchQuery, currentPage, selectedCompanies, setSearchParams]);
 
   return (
     <div className="listWrap">
